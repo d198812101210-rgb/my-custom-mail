@@ -165,6 +165,18 @@ export const rateLimits = pgTable(
   (t) => [primaryKey({ columns: [t.key, t.windowStart] })],
 ).enableRLS()
 
+// Browser push subscriptions (one row per installed browser). Endpoint is unique so
+// re-subscribing is an upsert; rows are deleted when the push service reports them gone.
+export const pushSubscriptions = pgTable('push_subscriptions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  endpoint: text('endpoint').notNull().unique(),
+  p256dh: text('p256dh').notNull(),
+  auth: text('auth').notNull(),
+  createdAt: timestamptz('created_at').notNull().defaultNow(),
+}).enableRLS()
+
+export type PushSubscriptionRow = typeof pushSubscriptions.$inferSelect
+
 export type Thread = typeof threads.$inferSelect
 export type Message = typeof messages.$inferSelect
 export type NewMessage = typeof messages.$inferInsert

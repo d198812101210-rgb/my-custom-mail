@@ -23,6 +23,18 @@ describe('parseEnv', () => {
     ).toBeUndefined()
   })
 
+  it('treats the VAPID keys as optional but only valid together', () => {
+    expect(parseEnv(valid).VAPID_PUBLIC_KEY).toBeUndefined()
+    const both = { VAPID_PUBLIC_KEY: 'pub', VAPID_PRIVATE_KEY: 'priv' }
+    expect(parseEnv({ ...valid, ...both }).VAPID_PRIVATE_KEY).toBe('priv')
+    expect(() => parseEnv({ ...valid, VAPID_PUBLIC_KEY: 'pub' })).toThrow(
+      /VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY must be set together/,
+    )
+    expect(() => parseEnv({ ...valid, VAPID_PRIVATE_KEY: 'priv' })).toThrow(
+      /set together/,
+    )
+  })
+
   it('defaults the pool size and validates an override', () => {
     expect(parseEnv(valid).DATABASE_POOL_MAX).toBe(5)
     expect(

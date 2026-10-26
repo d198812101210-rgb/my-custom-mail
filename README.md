@@ -29,6 +29,7 @@ the error names the variable, never its value.
 | `AUTH_FROM`                                 | Sender for login codes, e.g. `Login <login@tanakadev.digital>`.                                   |
 | `APP_URL`                                   | Public origin, e.g. `https://mail.tanakadev.digital`. Mutating requests must carry this `Origin`. |
 | `DATABASE_POOL_MAX`                         | Optional, connections per instance (default 5).                                                   |
+| `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`     | Optional, both or neither. Turns on Web Push notifications. Generate with `npm run vapid`.        |
 
 ## Local development
 
@@ -99,6 +100,26 @@ types, not against your accounts:
   test message once after deploying.
 - **Response headers on static files.** Nitro emits header rules into the Vercel route config; confirm with
   `curl -I` on `/sw.js` and `/manifest.webmanifest` after the first deploy.
+
+## Notifications (Web Push)
+
+New mail can raise a desktop notification (sender and subject, click opens the thread) even when the app
+window is closed. It works in Chrome and Edge once the app is installed or open in a browser; the browser
+must be running (Windows lets Chrome/Edge run in the background).
+
+1. `npm run vapid` prints a key pair. Put **both** lines in the Vercel env vars (never commit them) and redeploy.
+2. Run `npm run db:migrate` (adds the `push_subscriptions` table).
+3. Open the app, press **Turn on notifications** in the sidebar and allow the browser prompt. **Send a test** checks it.
+
+Notifications are sent from the Resend webhook right after a new email is saved, so they need the webhook
+from the deploy steps above. Mail pulled in by **Sync** does not notify. Each browser subscribes separately;
+turning notifications off removes its subscription. Rotating the VAPID keys invalidates existing
+subscriptions: the app notices and shows the button as off, so press it again.
+
+Privacy: the payload is end-to-end encrypted to the browser, travels through the browser vendor's push service
+and contains only sender, subject and a link. Subscription endpoints are only accepted from the push services
+of Chrome/Edge, Firefox, Windows and Safari, so the server cannot be pointed at arbitrary hosts. Push failures
+never affect saving mail: the webhook still answers 200.
 
 ## How it works
 

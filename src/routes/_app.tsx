@@ -5,15 +5,17 @@ import {
   useNavigate,
   useRouter,
 } from '@tanstack/react-router'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   LogoutIcon,
   MailIcon,
   PencilIcon,
   RefreshIcon,
 } from '#/components/icons'
+import { NotificationToggle } from '#/components/NotificationToggle'
 import { useHotkeys } from '#/lib/hotkeys'
 import { useOnline } from '#/lib/online'
+import { threadIdFromMessage } from '#/lib/push'
 import { logout, logoutEverywhere } from '#/server/auth.fn'
 import { syncMail } from '#/server/mail.fn'
 import { unreadCountsFn } from '#/server/threads.fn'
@@ -74,6 +76,18 @@ function AppLayout() {
     'g t': () => void navigate({ to: '/$folder', params: { folder: 'trash' } }),
   })
 
+  // The service worker asks us to open a thread when a notification is clicked.
+  useEffect(() => {
+    if (!('serviceWorker' in navigator)) return
+    const onMessage = (e: MessageEvent) => {
+      const id = threadIdFromMessage(e.data)
+      if (id) void navigate({ to: '/thread/$id', params: { id } })
+    }
+    navigator.serviceWorker.addEventListener('message', onMessage)
+    return () =>
+      navigator.serviceWorker.removeEventListener('message', onMessage)
+  }, [navigate])
+
   async function sync(full: boolean) {
     setSyncing(true)
     setNote(null)
@@ -119,6 +133,7 @@ function AppLayout() {
         </Link>
         <FolderNav vertical />
         <div className="mt-auto flex flex-col gap-2">
+          <NotificationToggle />
           <button
             className={btn}
             disabled={syncing}

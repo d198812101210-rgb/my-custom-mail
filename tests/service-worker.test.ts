@@ -35,8 +35,22 @@ function loadWorker(opts: { online: boolean }) {
       return Promise.resolve()
     },
   }
+  const shown: { title: string; options: Record<string, unknown> }[] = []
+  const opened: string[] = []
+  const posted: unknown[] = []
+  let focused = 0
+  let openWindows: {
+    postMessage: (m: unknown) => void
+    focus: () => unknown
+  }[] = []
   const self = {
     addEventListener: (type: string, fn: Listener) => listeners.set(type, fn),
+    registration: {
+      showNotification: (title: string, options: Record<string, unknown>) => {
+        shown.push({ title, options })
+        return Promise.resolve()
+      },
+    },
     skipWaiting: () => {
       skipped = true
       return Promise.resolve()
@@ -44,6 +58,11 @@ function loadWorker(opts: { online: boolean }) {
     clients: {
       claim: () => {
         claimed = true
+        return Promise.resolve()
+      },
+      matchAll: () => Promise.resolve(openWindows),
+      openWindow: (url: string) => {
+        opened.push(url)
         return Promise.resolve()
       },
     },
@@ -86,9 +105,49 @@ function loadWorker(opts: { online: boolean }) {
     return responded
   }
 
+  const pushEvent = async (data: unknown, raw?: string) => {
+    let work: Promise<unknown> = Promise.resolve()
+    listeners.get('push')?.({
+      data: {
+        json: () => {
+          if (raw !== undefined) return JSON.parse(raw) as unknown
+          return data
+        },
+      },
+      waitUntil: (p: Promise<unknown>) => (work = p),
+    })
+    await work
+  }
+
+  const clickEvent = async (url: unknown, windows: 'none' | 'one') => {
+    openWindows =
+      windows === 'one'
+        ? [
+            {
+              postMessage: (m) => posted.push(m),
+              focus: () => focused++,
+            },
+          ]
+        : []
+    let work: Promise<unknown> = Promise.resolve()
+    let closed = false
+    listeners.get('notificationclick')?.({
+      notification: { data: { url }, close: () => (closed = true) },
+      waitUntil: (p: Promise<unknown>) => (work = p),
+    })
+    await work
+    return closed
+  }
+
   return {
     lifecycle,
     fetchEvent,
+    pushEvent,
+    clickEvent,
+    shown,
+    opened,
+    posted,
+    focusCount: () => focused,
     cacheWrites,
     networkRequests,
     state: () => ({ claimed, skipped, deletedCaches }),
@@ -147,6 +206,77 @@ describe('service worker', () => {
     const source = readFileSync('public/sw.js', 'utf8')
     expect(source).not.toMatch(/\.put\(|\.addAll\(/)
     expect((source.match(/\.add\(/g) ?? []).length).toBe(1)
+  })
+})
+
+describe('web push', () => {
+  const id = '123e4567-e89b-12d3-a456-426614174000'
+
+  it('shows a notification from the payload and caches nothing', async () => {
+    const sw = loadWorker({ online: true })
+    await sw.pushEvent({
+      title: 'Ada',
+      body: 'Lunch?',
+      url: `/thread/${id}`,
+      tag: id,
+    })
+    expect(sw.shown).toHaveLength(1)
+    expect(sw.shown[0]?.title).toBe('Ada')
+    expect(sw.shown[0]?.options).toMatchObject({
+      body: 'Lunch?',
+      tag: id,
+      renotify: true,
+      data: { url: `/thread/${id}` },
+    })
+    expect(sw.cacheWrites).toHaveLength(0)
+    expect(sw.networkRequests).toHaveLength(0)
+  })
+
+  it('falls back to a generic notification for unreadable payloads', async () => {
+    const sw = loadWorker({ online: true })
+    await sw.pushEvent(undefined, 'not json')
+    expect(sw.shown[0]?.title).toBe('New mail')
+    expect(sw.shown[0]?.options).toMatchObject({ data: { url: '/inbox' } })
+  })
+
+  it.each([
+    'https://evil.example/thread/x',
+    '//evil.example',
+    'javascript:alert(1)',
+    '/api/attachments/1',
+    '/thread/../x',
+  ])('never links a notification to %s', async (url) => {
+    const sw = loadWorker({ online: true })
+    await sw.pushEvent({ title: 'x', body: 'y', url })
+    expect(sw.shown[0]?.options).toMatchObject({ data: { url: '/inbox' } })
+  })
+
+  it('limits text length', async () => {
+    const sw = loadWorker({ online: true })
+    await sw.pushEvent({ title: 't'.repeat(500), body: 'b'.repeat(500) })
+    expect(sw.shown[0]?.title).toHaveLength(100)
+    expect((sw.shown[0]?.options.body as string).length).toBe(200)
+  })
+
+  it('on click, closes the notification and asks an open window to route to the thread', async () => {
+    const sw = loadWorker({ online: true })
+    const closed = await sw.clickEvent(`/thread/${id}`, 'one')
+    expect(closed).toBe(true)
+    expect(sw.posted).toEqual([{ type: 'open', url: `/thread/${id}` }])
+    expect(sw.focusCount()).toBe(1)
+    expect(sw.opened).toHaveLength(0)
+  })
+
+  it('on click without an open window, opens one at the thread', async () => {
+    const sw = loadWorker({ online: true })
+    await sw.clickEvent(`/thread/${id}`, 'none')
+    expect(sw.opened).toEqual([`/thread/${id}`])
+  })
+
+  it('on click ignores a tampered link', async () => {
+    const sw = loadWorker({ online: true })
+    await sw.clickEvent('https://evil.example', 'none')
+    expect(sw.opened).toEqual(['/inbox'])
   })
 })
 

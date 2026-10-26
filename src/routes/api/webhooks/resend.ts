@@ -12,6 +12,8 @@ export const Route = createFileRoute('/api/webhooks/resend')({
           sources,
           { handleResendWebhook },
           address,
+          push,
+          pushServer,
         ] = await Promise.all([
           import('#/env.server'),
           import('#/db/client'),
@@ -19,7 +21,10 @@ export const Route = createFileRoute('/api/webhooks/resend')({
           import('#/server/mail/sources.server'),
           import('#/server/mail/webhook'),
           import('#/server/mail/address'),
+          import('#/server/mail/push'),
+          import('#/server/push.server'),
         ])
+        const pushTarget = pushServer.pushDeps()
         return handleResendWebhook(request, {
           secret: env.RESEND_WEBHOOK_SECRET,
           verify: (opts) => resend.webhooks.verify(opts),
@@ -29,6 +34,9 @@ export const Route = createFileRoute('/api/webhooks/resend')({
             store: sources.supabaseStore,
             ownDomain: address.mailboxDomain(env.MAIL_FROM),
           },
+          notify: pushTarget
+            ? (emailId) => push.notifyNewMail(pushTarget, emailId)
+            : undefined,
           log: (line) => console.error(line),
         })
       },

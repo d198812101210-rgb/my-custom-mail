@@ -26,6 +26,7 @@ describe('schema migration', () => {
       .insert(threads)
       .values({ normalizedSubject: 'invoice' })
       .returning()
+    if (!t) throw new Error('thread not inserted')
     await db.insert(messages).values({
       threadId: t.id,
       direction: 'in',
@@ -47,6 +48,7 @@ describe('schema migration', () => {
   it('rejects an unknown folder', async () => {
     const { db } = await createTestDb()
     const [t] = await db.insert(threads).values({ normalizedSubject: 'x' }).returning()
+    if (!t) throw new Error('thread not inserted')
     await expect(
       db.insert(messages).values({
         threadId: t.id,

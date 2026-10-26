@@ -9,8 +9,7 @@ export type ThreadMessage = NonNullable<
   Awaited<ReturnType<typeof getThreadFn>>
 >['messages'][number]
 
-const small =
-  'rounded border border-neutral-300 px-2 py-1 text-xs hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800'
+const small = 'btn px-2 py-1 text-xs'
 
 export function MessageCard({
   m,
@@ -29,7 +28,7 @@ export function MessageCard({
 
   return (
     <article
-      className="rounded-lg border border-neutral-200 dark:border-neutral-800"
+      className="border-line bg-panel/80 rounded-xl border shadow-[0_8px_40px_-20px_rgb(176_75_255/0.5)]"
       aria-label={`Message from ${m.fromName ?? m.fromAddress}`}
     >
       <button
@@ -44,7 +43,7 @@ export function MessageCard({
             {m.direction === 'out' ? 'Me' : (m.fromName ?? m.fromAddress)}
           </span>
           {open ? (
-            <span className="block text-xs break-words text-neutral-500">
+            <span className="block text-xs break-words text-faint">
               {sender}
               <br />
               To: {m.to.join(', ') || '—'}
@@ -53,7 +52,7 @@ export function MessageCard({
           ) : null}
         </span>
         <time
-          className="shrink-0 text-xs text-neutral-500"
+          className="shrink-0 text-xs text-faint"
           dateTime={new Date(m.date).toISOString()}
         >
           {fullDate(m.date)}
@@ -62,30 +61,24 @@ export function MessageCard({
 
       <div className="flex flex-wrap items-center gap-2 px-3 pb-2">
         {m.direction === 'in' && m.receivedFor.length > 0 ? (
-          <span className="rounded bg-neutral-100 px-1.5 text-xs leading-5 dark:bg-neutral-800">
-            Sent to {m.receivedFor.join(', ')}
-          </span>
+          <span className="chip">Sent to {m.receivedFor.join(', ')}</span>
         ) : null}
         {m.authFailures.length > 0 ? (
           <span
             role="alert"
-            className="rounded bg-amber-100 px-1.5 text-xs leading-5 font-medium text-amber-900 dark:bg-amber-900/40 dark:text-amber-200"
+            className="chip-warn"
             title="The sender could not be verified. Be careful with links and attachments."
           >
             ⚠ Failed sender checks: {m.authFailures.join(', ')}
           </span>
         ) : null}
-        {m.folder === 'trash' ? (
-          <span className="rounded bg-neutral-200 px-1.5 text-xs leading-5 dark:bg-neutral-700">
-            In trash
-          </span>
-        ) : null}
+        {m.folder === 'trash' ? <span className="chip">In trash</span> : null}
       </div>
 
       {open ? (
         <div className="space-y-3 px-3 pb-3">
           {m.body.hasRemoteContent && !loadImages ? (
-            <div className="flex items-center gap-2 text-xs text-neutral-600 dark:text-neutral-400">
+            <div className="flex items-center gap-2 text-dim text-xs">
               Remote images are blocked.
               <button className={small} onClick={() => setLoadImages(true)}>
                 Load images
@@ -101,11 +94,11 @@ export function MessageCard({
                 <li key={a.id}>
                   <a
                     href={`/api/attachments/${a.id}`}
-                    className="flex items-center gap-2 rounded border border-neutral-300 px-2 py-1 text-sm hover:bg-neutral-100 dark:border-neutral-700 dark:hover:bg-neutral-800"
+                    className="btn px-2 py-1"
                   >
                     <PaperclipIcon />{' '}
                     <span className="max-w-48 truncate">{a.filename}</span>
-                    <span className="text-xs text-neutral-500">
+                    <span className="text-xs text-faint">
                       {formatBytes(a.size)}
                     </span>
                   </a>

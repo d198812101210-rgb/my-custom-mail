@@ -35,7 +35,7 @@ function FolderPage() {
   }, [folder])
   return (
     <main>
-      <h2 className="px-4 pt-3 text-sm font-medium text-neutral-500 capitalize">
+      <h2 className="px-4 pt-3 text-sm font-medium text-dim capitalize">
         {folder}
       </h2>
       <ThreadList

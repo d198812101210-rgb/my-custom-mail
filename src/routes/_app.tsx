@@ -6,7 +6,12 @@ import {
   useRouter,
 } from '@tanstack/react-router'
 import { useRef, useState } from 'react'
-import { LogoutIcon, PencilIcon, RefreshIcon } from '#/components/icons'
+import {
+  LogoutIcon,
+  MailIcon,
+  PencilIcon,
+  RefreshIcon,
+} from '#/components/icons'
 import { useHotkeys } from '#/lib/hotkeys'
 import { useOnline } from '#/lib/online'
 import { logout, logoutEverywhere } from '#/server/auth.fn'
@@ -39,16 +44,11 @@ function FolderNav({ vertical }: { vertical?: boolean }) {
           key={f.id}
           to="/$folder"
           params={{ folder: f.id }}
-          className="flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm whitespace-nowrap hover:bg-neutral-100 dark:hover:bg-neutral-800"
-          activeProps={{
-            className: 'bg-neutral-200 font-medium dark:bg-neutral-800',
-          }}
+          className="nav-link"
         >
           {f.label}
           {counts[f.id] > 0 && f.id !== 'trash' ? (
-            <span className="rounded-full bg-blue-600 px-2 py-0.5 text-xs text-white">
-              {counts[f.id]}
-            </span>
+            <span className="badge">{counts[f.id]}</span>
           ) : null}
         </Link>
       ))}
@@ -99,17 +99,21 @@ function AppLayout() {
     window.location.assign('/login')
   }
 
-  const btn =
-    'rounded-lg border border-neutral-300 px-3 py-1.5 text-sm hover:bg-neutral-100 disabled:opacity-50 dark:border-neutral-700 dark:hover:bg-neutral-800'
+  const btn = 'btn'
 
   return (
     <div className="min-h-dvh md:grid md:grid-cols-[14rem_1fr]">
-      <aside className="hidden border-r border-neutral-200 p-3 md:flex md:flex-col md:gap-4 dark:border-neutral-800">
-        <h1 className="px-3 pt-1 text-lg font-semibold">Mailbox</h1>
+      <aside className="hidden border-r border-line bg-panel/60 p-3 backdrop-blur md:flex md:flex-col md:gap-4">
+        <h1 className="flex items-center gap-2.5 px-3 pt-1 text-lg font-semibold">
+          <span className="bg-neon glow grid size-8 place-items-center rounded-lg text-white">
+            <MailIcon width={18} height={18} />
+          </span>
+          <span className="text-neon">Mailbox</span>
+        </h1>
         <Link
           to="/compose"
           search={{ mode: 'new' }}
-          className="rounded-lg bg-neutral-900 px-3 py-2 text-center text-sm font-medium text-white dark:bg-neutral-100 dark:text-neutral-900"
+          className="btn btn-primary py-2"
         >
           Compose
         </Link>
@@ -139,9 +143,11 @@ function AppLayout() {
       </aside>
 
       <div className="flex min-w-0 flex-col">
-        <header className="sticky top-0 z-10 flex flex-col gap-2 border-b border-neutral-200 bg-white/95 px-3 py-2 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/95">
+        <header className="border-line bg-ink/80 sticky top-0 z-10 flex flex-col gap-2 border-b px-3 py-2 backdrop-blur-md">
           <div className="flex items-center gap-2">
-            <h1 className="text-lg font-semibold md:hidden">Mailbox</h1>
+            <h1 className="text-neon text-lg font-semibold md:hidden">
+              Mailbox
+            </h1>
             <form
               className="min-w-0 flex-1"
               role="search"
@@ -160,7 +166,7 @@ function AppLayout() {
                 placeholder="Search mail  ( / )"
                 aria-label="Search mail"
                 maxLength={200}
-                className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-sm outline-none focus:border-neutral-900 dark:border-neutral-700 dark:bg-neutral-900 dark:focus:border-neutral-300"
+                className="field"
               />
             </form>
             <Link
@@ -191,18 +197,12 @@ function AppLayout() {
             <FolderNav />
           </div>
           {!online ? (
-            <p
-              role="status"
-              className="rounded bg-amber-100 px-2 py-1 text-xs text-amber-900 dark:bg-amber-900/40 dark:text-amber-200"
-            >
+            <p role="status" className="chip-warn px-2 py-1">
               You're offline. Mail will load again when the connection returns.
             </p>
           ) : null}
           {note ? (
-            <p
-              role="status"
-              className="text-xs text-neutral-600 dark:text-neutral-400"
-            >
+            <p role="status" className="text-dim text-xs">
               {note}
             </p>
           ) : null}

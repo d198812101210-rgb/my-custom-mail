@@ -68,7 +68,7 @@ export function ThreadList({
   })
 
   if (threads.length === 0) {
-    return <p className="px-4 py-16 text-center text-neutral-500">{empty}</p>
+    return <p className="px-4 py-16 text-dim text-center">{empty}</p>
   }
 
   return (
@@ -87,7 +87,7 @@ export function ThreadList({
       {cursor ? (
         <div className="p-4 text-center">
           <button
-            className="rounded-lg border border-neutral-300 px-4 py-2 text-sm dark:border-neutral-700"
+            className="btn px-4 py-2"
             disabled={loading}
             onClick={() => void loadMore()}
           >
@@ -114,20 +114,16 @@ function ThreadRow({
   const who =
     t.direction === 'out' ? `To: ${t.to.join(', ') || '—'}` : senderLabel(t)
   return (
-    <li
-      className={`group relative border-b border-neutral-100 dark:border-neutral-900 ${
-        active ? 'bg-neutral-100 dark:bg-neutral-900' : ''
-      }`}
-    >
+    <li className={`group row ${active ? 'row-active' : ''}`}>
       <Link
         to="/thread/$id"
         params={{ id: t.id }}
-        className="block px-4 py-3 pr-3 hover:bg-neutral-50 md:pr-24 dark:hover:bg-neutral-900/60"
+        className="block px-4 py-3 pr-3 md:pr-24"
       >
         <div className="flex items-baseline gap-2">
           <span
             aria-label={unread ? 'Unread' : undefined}
-            className={`mt-1 size-2 shrink-0 self-center rounded-full ${unread ? 'bg-blue-600' : 'bg-transparent'}`}
+            className={`size-2 shrink-0 self-center rounded-full ${unread ? 'unread-dot' : ''}`}
           />
           <span
             className={`min-w-0 flex-1 truncate ${unread ? 'font-semibold' : ''}`}
@@ -135,18 +131,18 @@ function ThreadRow({
             {who}
           </span>
           {t.count > 1 ? (
-            <span className="text-xs text-neutral-500">{t.count}</span>
+            <span className="text-faint text-xs">{t.count}</span>
           ) : null}
           {t.hasAttachments ? (
             <PaperclipIcon
               aria-label="Has attachments"
               aria-hidden={false}
               role="img"
-              className="shrink-0 text-neutral-500"
+              className="text-faint shrink-0"
             />
           ) : null}
           <time
-            className="shrink-0 text-xs text-neutral-500"
+            className="shrink-0 text-faint text-xs"
             dateTime={new Date(t.lastAt).toISOString()}
             suppressHydrationWarning
           >
@@ -156,10 +152,10 @@ function ThreadRow({
         <div className={`truncate pl-4 text-sm ${unread ? 'font-medium' : ''}`}>
           {t.subject || '(no subject)'}
         </div>
-        <div className="flex gap-2 pl-4 text-sm text-neutral-500">
+        <div className="flex gap-2 text-dim pl-4 text-sm">
           <span className="min-w-0 flex-1 truncate">{t.snippet}</span>
           {t.direction === 'in' && t.receivedFor[0] ? (
-            <span className="hidden shrink-0 rounded bg-neutral-100 px-1.5 text-xs leading-5 sm:inline dark:bg-neutral-800">
+            <span className="chip hidden shrink-0 sm:inline">
               → {t.receivedFor[0]}
             </span>
           ) : null}
@@ -168,7 +164,7 @@ function ThreadRow({
       <div className="absolute top-2 right-3 hidden gap-1 group-hover:flex md:group-focus-within:flex">
         {folder !== 'archive' && folder !== 'sent' ? (
           <button
-            className="rounded border border-neutral-300 bg-white px-2 py-1 text-xs dark:border-neutral-700 dark:bg-neutral-900"
+            className="btn bg-panel px-2 py-1 text-xs"
             onClick={() => onMove('archive')}
           >
             Archive
@@ -176,7 +172,7 @@ function ThreadRow({
         ) : null}
         {folder === 'archive' || folder === 'trash' ? (
           <button
-            className="rounded border border-neutral-300 bg-white px-2 py-1 text-xs dark:border-neutral-700 dark:bg-neutral-900"
+            className="btn bg-panel px-2 py-1 text-xs"
             onClick={() => onMove('inbox')}
           >
             Restore
@@ -184,7 +180,7 @@ function ThreadRow({
         ) : null}
         {folder !== 'trash' ? (
           <button
-            className="rounded border border-neutral-300 bg-white px-2 py-1 text-xs dark:border-neutral-700 dark:bg-neutral-900"
+            className="btn bg-panel px-2 py-1 text-xs"
             onClick={() => onMove('trash')}
           >
             Trash

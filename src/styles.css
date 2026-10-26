@@ -1,7 +1,38 @@
 @import 'tailwindcss';
 
+/*
+ * Neon theme: near-black violet surfaces with a red -> purple gradient accent.
+ * The app is dark only; mail bodies stay on a light card inside their sandboxed
+ * iframe so newsletters render as their authors intended.
+ */
+@theme {
+  --color-ink: #07050d;
+  --color-panel: #0d0818;
+  --color-raised: #150e25;
+  --color-line: #2b1e46;
+  --color-fg: #f6f2ff;
+  --color-dim: #a89dc9;
+  --color-faint: #766b9a;
+  --color-neon-red: #ff3b5c;
+  --color-neon-purple: #b04bff;
+  --color-neon-violet: #7c4dff;
+  --animate-drift: drift 16s ease-in-out infinite;
+  --animate-drift-slow: drift 24s ease-in-out infinite reverse;
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(4%, -6%, 0) scale(1.12);
+  }
+}
+
 :root {
-  color-scheme: light dark;
+  color-scheme: dark;
+  accent-color: #b04bff;
 }
 
 html,
@@ -11,10 +42,195 @@ body {
 
 body {
   margin: 0;
+  color: var(--color-fg);
   font-family:
+    'Inter',
     system-ui,
     -apple-system,
     'Segoe UI',
     Roboto,
     sans-serif;
+  background-color: var(--color-ink);
+  background-image:
+    radial-gradient(
+      55rem 38rem at 8% -12%,
+      rgb(255 59 92 / 0.13),
+      transparent 62%
+    ),
+    radial-gradient(
+      48rem 38rem at 100% 0%,
+      rgb(176 75 255 / 0.16),
+      transparent 58%
+    );
+  background-attachment: fixed;
+}
+
+::selection {
+  background: rgb(176 75 255 / 0.45);
+}
+
+* {
+  scrollbar-color: #3a2a5e transparent;
+  scrollbar-width: thin;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-neon-purple);
+  outline-offset: 2px;
+}
+
+@utility bg-neon {
+  background-image: linear-gradient(
+    135deg,
+    var(--color-neon-red) 0%,
+    var(--color-neon-purple) 100%
+  );
+}
+
+@utility text-neon {
+  background-image: linear-gradient(100deg, #ff5d78 0%, #d06bff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility glow {
+  box-shadow:
+    0 0 0 1px rgb(176 75 255 / 0.3),
+    0 10px 40px -12px rgb(255 59 92 / 0.55),
+    0 0 60px -20px rgb(176 75 255 / 0.7);
+}
+
+@layer components {
+  .glass {
+    background: linear-gradient(
+      160deg,
+      rgb(28 18 48 / 0.78),
+      rgb(13 8 24 / 0.82)
+    );
+    border: 1px solid rgb(176 75 255 / 0.22);
+    backdrop-filter: blur(18px);
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-line bg-raised/70 px-3 py-1.5 text-sm text-fg transition;
+  }
+  .btn:hover:not(:disabled) {
+    border-color: rgb(176 75 255 / 0.7);
+    box-shadow: 0 0 18px -4px rgb(176 75 255 / 0.65);
+  }
+  .btn:disabled {
+    @apply opacity-50;
+  }
+
+  .btn-primary {
+    @apply bg-neon border-transparent font-medium text-white;
+    box-shadow: 0 8px 26px -8px rgb(255 59 92 / 0.65);
+  }
+  .btn-primary:hover:not(:disabled) {
+    border-color: transparent;
+    filter: brightness(1.12);
+    box-shadow:
+      0 10px 34px -6px rgb(255 59 92 / 0.8),
+      0 0 28px -6px rgb(176 75 255 / 0.8);
+  }
+
+  .field {
+    @apply w-full rounded-lg border border-line bg-ink/70 px-3 py-2 text-sm text-fg outline-none transition placeholder:text-faint;
+  }
+  .field:focus {
+    border-color: var(--color-neon-purple);
+    box-shadow:
+      0 0 0 3px rgb(176 75 255 / 0.22),
+      0 0 22px -6px rgb(176 75 255 / 0.6);
+  }
+
+  .chip {
+    @apply rounded px-1.5 text-xs leading-5;
+    background: rgb(176 75 255 / 0.16);
+    color: #dcbfff;
+  }
+  .chip-warn {
+    @apply rounded px-1.5 text-xs leading-5 font-medium;
+    background: rgb(255 59 92 / 0.16);
+    color: #ffb8c4;
+    box-shadow: inset 0 0 0 1px rgb(255 59 92 / 0.35);
+  }
+
+  .unread-dot {
+    @apply bg-neon size-2 shrink-0 rounded-full;
+    box-shadow: 0 0 10px 1px rgb(255 59 92 / 0.8);
+  }
+
+  .badge {
+    @apply bg-neon rounded-full px-2 py-0.5 text-xs font-medium text-white;
+    box-shadow: 0 0 14px -2px rgb(255 59 92 / 0.7);
+  }
+
+  .nav-link {
+    @apply relative flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm whitespace-nowrap text-dim transition;
+  }
+  .nav-link:hover {
+    @apply bg-raised text-fg;
+  }
+  .nav-link[aria-current='page'] {
+    @apply bg-raised font-medium text-fg;
+    box-shadow: inset 0 0 0 1px rgb(176 75 255 / 0.28);
+  }
+  .nav-link[aria-current='page']::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 22%;
+    bottom: 22%;
+    width: 3px;
+    border-radius: 3px;
+    background: linear-gradient(
+      180deg,
+      var(--color-neon-red),
+      var(--color-neon-purple)
+    );
+    box-shadow: 0 0 12px rgb(255 59 92 / 0.9);
+  }
+
+  .row {
+    @apply relative border-b border-line/60 transition;
+  }
+  .row:hover {
+    background: linear-gradient(
+      90deg,
+      rgb(255 59 92 / 0.07),
+      rgb(176 75 255 / 0.06) 60%,
+      transparent
+    );
+  }
+  .row-active {
+    background: linear-gradient(
+      90deg,
+      rgb(255 59 92 / 0.12),
+      rgb(176 75 255 / 0.1) 60%,
+      transparent
+    );
+    box-shadow: inset 3px 0 0 var(--color-neon-purple);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Login backdrop: faint neon grid that fades out toward the edges. */
+.grid-bg {
+  background-image:
+    linear-gradient(rgb(176 75 255 / 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(176 75 255 / 0.08) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(
+    ellipse 70% 60% at 50% 45%,
+    #000 20%,
+    transparent 75%
+  );
 }

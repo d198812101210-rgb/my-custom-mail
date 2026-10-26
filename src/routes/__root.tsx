@@ -16,16 +16,8 @@ export const Route = createRootRoute({
       {
         title: 'Mailbox',
       },
-      {
-        name: 'theme-color',
-        content: '#ffffff',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        name: 'theme-color',
-        content: '#111827',
-        media: '(prefers-color-scheme: dark)',
-      },
+      { name: 'theme-color', content: '#07050d' },
+      { name: 'color-scheme', content: 'dark' },
       { name: 'mobile-web-app-capable', content: 'yes' },
       { name: 'apple-mobile-web-app-capable', content: 'yes' },
       { name: 'apple-mobile-web-app-title', content: 'Mailbox' },
@@ -65,7 +57,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body className="bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
+      <body>
         {children}
 
         <Scripts />

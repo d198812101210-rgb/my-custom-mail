@@ -8,6 +8,7 @@ import {
 import { useRef, useState } from 'react'
 import { LogoutIcon, PencilIcon, RefreshIcon } from '#/components/icons'
 import { useHotkeys } from '#/lib/hotkeys'
+import { useOnline } from '#/lib/online'
 import { logout, logoutEverywhere } from '#/server/auth.fn'
 import { syncMail } from '#/server/mail.fn'
 import { unreadCountsFn } from '#/server/threads.fn'
@@ -59,6 +60,7 @@ function AppLayout() {
   const router = useRouter()
   const navigate = useNavigate()
   const searchRef = useRef<HTMLInputElement>(null)
+  const online = useOnline()
   const [syncing, setSyncing] = useState(false)
   const [note, setNote] = useState<string | null>(null)
 
@@ -188,6 +190,14 @@ function AppLayout() {
           <div className="md:hidden">
             <FolderNav />
           </div>
+          {!online ? (
+            <p
+              role="status"
+              className="rounded bg-amber-100 px-2 py-1 text-xs text-amber-900 dark:bg-amber-900/40 dark:text-amber-200"
+            >
+              You're offline. Mail will load again when the connection returns.
+            </p>
+          ) : null}
           {note ? (
             <p
               role="status"

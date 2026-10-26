@@ -10,7 +10,23 @@ export default defineConfig({
     // CSRF is enforced for every mutating request (server functions included)
     // by the Origin check in src/start.ts, so Start's default warning does not apply.
     tanstackStart({ serverFns: { disableCsrfMiddlewareWarning: true } }),
-    nitro(),
+    nitro({
+      routeRules: {
+        // A cached service worker would delay every update by up to a day.
+        '/sw.js': {
+          headers: {
+            'cache-control': 'no-cache, max-age=0, must-revalidate',
+            'service-worker-allowed': '/',
+          },
+        },
+        '/manifest.webmanifest': {
+          headers: {
+            'content-type': 'application/manifest+json',
+            'cache-control': 'public, max-age=0, must-revalidate',
+          },
+        },
+      },
+    }),
     viteReact(),
     tailwindcss(),
   ],

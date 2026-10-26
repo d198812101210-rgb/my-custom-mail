@@ -17,7 +17,9 @@
     "test": "vitest run",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx scripts/migrate.ts",
-    "db:setup-storage": "tsx scripts/setup-storage.ts"
+    "db:setup-storage": "tsx scripts/setup-storage.ts",
+    "test:headers": "tsx scripts/test-resend-headers.ts",
+    "dev:db": "tsx scripts/dev-db.ts --seed"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",
@@ -36,6 +38,7 @@
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.12",
+    "@electric-sql/pglite-socket": "^0.2.15",
     "@tanstack/eslint-config": "0.4.0",
     "@tanstack/router-cli": "^1.132.0",
     "@types/node": "^22.10.2",
@@ -47,6 +50,7 @@
     "drizzle-kit": "^0.31.11",
     "eslint": "^9.20.0",
     "prettier": "^3.8.1",
+    "svix": "^2.9.0",
     "tsx": "^4.23.15",
     "typescript": "^6.0.2",
     "vite": "^8.0.0",

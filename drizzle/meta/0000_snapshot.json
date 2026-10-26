@@ -1,5 +1,5 @@
 {
-  "id": "bace56cb-eb25-41a0-841d-a13168e2c9bb",
+  "id": "8c8ddb2e-d8ef-4b62-91b5-58f7e19a2bc3",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -108,12 +108,8 @@
           "name": "attachments_message_id_messages_id_fk",
           "tableFrom": "attachments",
           "tableTo": "messages",
-          "columnsFrom": [
-            "message_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["message_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -287,7 +283,7 @@
           "primaryKey": false,
           "notNull": false,
           "generated": {
-            "as": "to_tsvector('simple', coalesce(subject, '') || ' ' || coalesce(text_body, '') || ' ' || coalesce(from_address, '') || ' ' || coalesce(from_name, ''))",
+            "as": "to_tsvector('simple', translate(coalesce(subject, '') || ' ' || coalesce(text_body, '') || ' ' || coalesce(from_address, '') || ' ' || coalesce(from_name, ''), '@._-/', '     '))",
             "type": "stored"
           }
         }
@@ -386,12 +382,8 @@
           "name": "messages_thread_id_threads_id_fk",
           "tableFrom": "messages",
           "tableTo": "threads",
-          "columnsFrom": [
-            "thread_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["thread_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -492,10 +484,7 @@
       "compositePrimaryKeys": {
         "rate_limits_key_window_start_pk": {
           "name": "rate_limits_key_window_start_pk",
-          "columns": [
-            "key",
-            "window_start"
-          ]
+          "columns": ["key", "window_start"]
         }
       },
       "uniqueConstraints": {},

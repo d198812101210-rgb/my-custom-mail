@@ -36,7 +36,7 @@ CREATE TABLE "messages" (
 	"folder" text DEFAULT 'inbox' NOT NULL,
 	"sent_or_received_at" timestamp with time zone NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	"search" "tsvector" GENERATED ALWAYS AS (to_tsvector('simple', coalesce(subject, '') || ' ' || coalesce(text_body, '') || ' ' || coalesce(from_address, '') || ' ' || coalesce(from_name, ''))) STORED,
+	"search" "tsvector" GENERATED ALWAYS AS (to_tsvector('simple', translate(coalesce(subject, '') || ' ' || coalesce(text_body, '') || ' ' || coalesce(from_address, '') || ' ' || coalesce(from_name, ''), '@._-/', '     '))) STORED,
 	CONSTRAINT "messages_direction_check" CHECK ("messages"."direction" in ('in', 'out')),
 	CONSTRAINT "messages_folder_check" CHECK ("messages"."folder" in ('inbox', 'archive', 'trash', 'sent'))
 );

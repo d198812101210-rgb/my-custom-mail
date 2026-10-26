@@ -17,7 +17,8 @@
     "test": "vitest run",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx scripts/migrate.ts",
-    "db:setup-storage": "tsx scripts/setup-storage.ts"
+    "db:setup-storage": "tsx scripts/setup-storage.ts",
+    "test:headers": "tsx scripts/test-resend-headers.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",

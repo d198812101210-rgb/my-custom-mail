@@ -171,3 +171,47 @@ export function renderMessageBody(m: {
   if (m.htmlBody?.trim()) return sanitizeMailHtml(m.htmlBody)
   return textToHtml(m.textBody ?? '')
 }
+
+/**
+ * Original HTML placed inside an outgoing reply/forward. Stricter than display:
+ * no <style> and no images at all, so a tracking pixel in the original is never
+ * re-sent to our recipients.
+ */
+export function quoteHtml(html: string): string {
+  return sanitizeHtml(html, {
+    allowedTags: TAGS.filter((t) => t !== 'style' && t !== 'img'),
+    allowedAttributes: {
+      '*': ['style', 'dir', 'lang', 'align'],
+      a: ['href'],
+      table: ['width', 'border', 'cellpadding', 'cellspacing'],
+      td: ['width', 'colspan', 'rowspan'],
+      th: ['width', 'colspan', 'rowspan'],
+    },
+    allowedSchemes: ['http', 'https', 'mailto', 'tel'],
+    allowProtocolRelative: false,
+    nonTextTags: ['script', 'style', 'textarea', 'option', 'noscript', 'title'],
+  })
+}
+
+const ENTITIES: Record<string, string> = {
+  '&amp;': '&',
+  '&lt;': '<',
+  '&gt;': '>',
+  '&quot;': '"',
+  '&#39;': "'",
+  '&nbsp;': ' ',
+}
+
+/** Visible text of an HTML mail, for quoting when there is no text part. */
+export function htmlToPlainText(html: string): string {
+  const stripped = sanitizeHtml(html, {
+    allowedTags: [],
+    allowedAttributes: {},
+    nonTextTags: ['script', 'style', 'textarea', 'option', 'noscript', 'title'],
+  })
+  return stripped
+    .replace(/&(?:amp|lt|gt|quot|#39|nbsp);/g, (m) => ENTITIES[m] ?? m)
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+}

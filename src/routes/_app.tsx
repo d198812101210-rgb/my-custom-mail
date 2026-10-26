@@ -6,7 +6,7 @@ import {
   useRouter,
 } from '@tanstack/react-router'
 import { useRef, useState } from 'react'
-import { LogoutIcon, RefreshIcon } from '#/components/icons'
+import { LogoutIcon, PencilIcon, RefreshIcon } from '#/components/icons'
 import { useHotkeys } from '#/lib/hotkeys'
 import { logout, logoutEverywhere } from '#/server/auth.fn'
 import { syncMail } from '#/server/mail.fn'
@@ -64,6 +64,7 @@ function AppLayout() {
 
   useHotkeys({
     '/': () => searchRef.current?.focus(),
+    c: () => void navigate({ to: '/compose', search: { mode: 'new' } }),
     'g i': () => void navigate({ to: '/$folder', params: { folder: 'inbox' } }),
     'g a': () =>
       void navigate({ to: '/$folder', params: { folder: 'archive' } }),
@@ -103,6 +104,13 @@ function AppLayout() {
     <div className="min-h-dvh md:grid md:grid-cols-[14rem_1fr]">
       <aside className="hidden border-r border-neutral-200 p-3 md:flex md:flex-col md:gap-4 dark:border-neutral-800">
         <h1 className="px-3 pt-1 text-lg font-semibold">Mailbox</h1>
+        <Link
+          to="/compose"
+          search={{ mode: 'new' }}
+          className="rounded-lg bg-neutral-900 px-3 py-2 text-center text-sm font-medium text-white dark:bg-neutral-100 dark:text-neutral-900"
+        >
+          Compose
+        </Link>
         <FolderNav vertical />
         <div className="mt-auto flex flex-col gap-2">
           <button
@@ -153,6 +161,14 @@ function AppLayout() {
                 className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-sm outline-none focus:border-neutral-900 dark:border-neutral-700 dark:bg-neutral-900 dark:focus:border-neutral-300"
               />
             </form>
+            <Link
+              to="/compose"
+              search={{ mode: 'new' }}
+              className={`${btn} md:hidden`}
+              aria-label="Compose"
+            >
+              <PencilIcon />
+            </Link>
             <button
               className={`${btn} md:hidden`}
               disabled={syncing}

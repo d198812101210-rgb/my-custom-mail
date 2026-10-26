@@ -13,6 +13,7 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppFolderRouteImport } from './routes/_app/$folder'
+import { Route as AppComposeRouteImport } from './routes/_app/compose'
 import { Route as AppSearchRouteImport } from './routes/_app/search'
 import { Route as AppThreadIdRouteImport } from './routes/_app/thread.$id'
 import { Route as ApiAttachmentsIdRouteImport } from './routes/api/attachments/$id'
@@ -37,6 +38,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
 const AppFolderRoute = AppFolderRouteImport.update({
   id: '/$folder',
   path: '/$folder',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppComposeRoute = AppComposeRouteImport.update({
+  id: '/compose',
+  path: '/compose',
   getParentRoute: () => AppRoute,
 } as any)
 const AppSearchRoute = AppSearchRouteImport.update({
@@ -74,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/login': typeof LoginRoute
   '/$folder': typeof AppFolderRoute
+  '/compose': typeof AppComposeRoute
   '/search': typeof AppSearchRoute
   '/thread/$id': typeof AppThreadIdRoute
   '/api/attachments/$id': typeof ApiAttachmentsIdRoute
@@ -84,6 +91,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/$folder': typeof AppFolderRoute
+  '/compose': typeof AppComposeRoute
   '/search': typeof AppSearchRoute
   '/': typeof AppIndexRoute
   '/thread/$id': typeof AppThreadIdRoute
@@ -97,6 +105,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/_app/$folder': typeof AppFolderRoute
+  '/_app/compose': typeof AppComposeRoute
   '/_app/search': typeof AppSearchRoute
   '/_app/': typeof AppIndexRoute
   '/_app/thread/$id': typeof AppThreadIdRoute
@@ -111,6 +120,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/$folder'
+    | '/compose'
     | '/search'
     | '/thread/$id'
     | '/api/attachments/$id'
@@ -121,6 +131,7 @@ export interface FileRouteTypes {
   to:
     | '/login'
     | '/$folder'
+    | '/compose'
     | '/search'
     | '/'
     | '/thread/$id'
@@ -133,6 +144,7 @@ export interface FileRouteTypes {
     | '/_app'
     | '/login'
     | '/_app/$folder'
+    | '/_app/compose'
     | '/_app/search'
     | '/_app/'
     | '/_app/thread/$id'
@@ -179,6 +191,13 @@ declare module '@tanstack/react-router' {
       path: '/$folder'
       fullPath: '/$folder'
       preLoaderRoute: typeof AppFolderRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/compose': {
+      id: '/_app/compose'
+      path: '/compose'
+      fullPath: '/compose'
+      preLoaderRoute: typeof AppComposeRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/search': {
@@ -228,6 +247,7 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppFolderRoute: typeof AppFolderRoute
+  AppComposeRoute: typeof AppComposeRoute
   AppSearchRoute: typeof AppSearchRoute
   AppIndexRoute: typeof AppIndexRoute
   AppThreadIdRoute: typeof AppThreadIdRoute
@@ -235,6 +255,7 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppFolderRoute: AppFolderRoute,
+  AppComposeRoute: AppComposeRoute,
   AppSearchRoute: AppSearchRoute,
   AppIndexRoute: AppIndexRoute,
   AppThreadIdRoute: AppThreadIdRoute,

@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { env, STORAGE_BUCKET } from '#/env.server'
 import { resend } from './resend.server'
+import type { BlobIO, Mailer } from './send'
 import type {
   AttachmentMeta,
   BlobStore,
@@ -92,5 +93,44 @@ export const supabaseStore: BlobStore = {
       upsert: true,
     })
     if (error) fail('storage upload', error)
+  },
+}
+
+export const resendMailer: Mailer = {
+  async send(p, { idempotencyKey }) {
+    const { data, error } = await resend.emails.send(
+      {
+        from: p.from,
+        to: p.to,
+        cc: p.cc.length > 0 ? p.cc : undefined,
+        bcc: p.bcc.length > 0 ? p.bcc : undefined,
+        subject: p.subject,
+        text: p.text,
+        html: p.html,
+        headers: p.headers,
+        attachments: p.attachments.map((a) => ({
+          filename: a.filename,
+          contentType: a.contentType,
+          content: Buffer.from(a.content),
+        })),
+      },
+      { idempotencyKey },
+    )
+    if (error) fail('resend send', error)
+    return { id: data.id }
+  },
+}
+
+export const supabaseBlobs: BlobIO = {
+  async download(path) {
+    const { data, error } = await storage.download(path)
+    if (error) fail('storage download', error)
+    return new Uint8Array(await data.arrayBuffer())
+  },
+  put: supabaseStore.put,
+  async remove(paths) {
+    if (paths.length === 0) return
+    const { error } = await storage.remove(paths)
+    if (error) fail('storage remove', error)
   },
 }

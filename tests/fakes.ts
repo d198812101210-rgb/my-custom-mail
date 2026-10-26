@@ -1,3 +1,4 @@
+import type { BlobIO, Mailer, OutgoingPayload } from '../src/server/mail/send'
 import type {
   AttachmentMeta,
   BlobStore,
@@ -94,3 +95,45 @@ export const attachment = (
   downloadUrl: `https://files.example/${id}`,
   ...over,
 })
+
+export class FakeMailer implements Mailer {
+  sent: OutgoingPayload[] = []
+  byKey = new Map<string, string>()
+  fail = false
+  send(payload: OutgoingPayload, opts: { idempotencyKey: string }) {
+    if (this.fail) return Promise.reject(new Error('provider down'))
+    const known = this.byKey.get(opts.idempotencyKey)
+    if (known) return Promise.resolve({ id: known }) // idempotent: not sent again
+    const id = `sent_${this.byKey.size + 1}`
+    this.byKey.set(opts.idempotencyKey, id)
+    this.sent.push(payload)
+    return Promise.resolve({ id })
+  }
+}
+
+export class FakeBlobs implements BlobIO {
+  objects = new Map<string, { bytes: Uint8Array; contentType: string }>()
+  failNextPut = false
+  put(path: string, bytes: Uint8Array, contentType: string) {
+    if (this.failNextPut) {
+      this.failNextPut = false
+      return Promise.reject(new Error('storage down'))
+    }
+    this.objects.set(path, { bytes, contentType })
+    return Promise.resolve()
+  }
+  download(path: string) {
+    const o = this.objects.get(path)
+    return o ? Promise.resolve(o.bytes) : Promise.reject(new Error('missing'))
+  }
+  remove(paths: string[]) {
+    for (const p of paths) this.objects.delete(p)
+    return Promise.resolve()
+  }
+  seed(path: string, text: string, contentType = 'application/octet-stream') {
+    this.objects.set(path, {
+      bytes: new TextEncoder().encode(text),
+      contentType,
+    })
+  }
+}

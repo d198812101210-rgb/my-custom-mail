@@ -36,11 +36,9 @@ const ERRORS: Record<string, string> = {
     'The message was sent, but saving it failed. Press Send again to finish; it will not be sent twice.',
 }
 
-const input =
-  'w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-neutral-900 dark:border-neutral-700 dark:bg-neutral-900 dark:focus:border-neutral-300'
-const label = 'w-12 shrink-0 pt-2 text-sm text-neutral-500'
-const btn =
-  'rounded-lg border border-neutral-300 px-3 py-1.5 text-sm hover:bg-neutral-100 disabled:opacity-50 dark:border-neutral-700 dark:hover:bg-neutral-800'
+const input = 'field'
+const label = 'text-dim w-12 shrink-0 pt-2 text-sm'
+const btn = 'btn'
 
 export function Composer({ initial }: { initial: Draft }) {
   // Snapshot: the loader may re-run (e.g. after a sync) and must not reset the form.
@@ -250,12 +248,12 @@ export function Composer({ initial }: { initial: Draft }) {
       />
 
       {draft.quote ? (
-        <details className="text-sm text-neutral-600 dark:text-neutral-400">
+        <details className="text-dim text-sm">
           <summary className="cursor-pointer">
             {draft.mode === 'forward' ? 'Forwarded message' : 'Quoted message'}{' '}
             (added automatically)
           </summary>
-          <pre className="mt-2 max-h-64 overflow-auto rounded border border-neutral-200 p-2 text-xs whitespace-pre-wrap dark:border-neutral-800">
+          <pre className="mt-2 max-h-64 overflow-auto border-line bg-panel/70 rounded-lg border p-2 text-xs whitespace-pre-wrap">
             {draft.quote}
           </pre>
         </details>
@@ -263,9 +261,7 @@ export function Composer({ initial }: { initial: Draft }) {
 
       {draft.forwardable.length > 0 ? (
         <fieldset className="space-y-1 text-sm">
-          <legend className="text-neutral-500">
-            Attachments of the original
-          </legend>
+          <legend className="text-faint">Attachments of the original</legend>
           {draft.forwardable.map((f) => (
             <label key={f.id} className="flex items-center gap-2">
               <input
@@ -281,7 +277,7 @@ export function Composer({ initial }: { initial: Draft }) {
                 }
               />
               {f.filename}{' '}
-              <span className="text-neutral-500">{formatBytes(f.size)}</span>
+              <span className="text-faint">{formatBytes(f.size)}</span>
             </label>
           ))}
         </fieldset>
@@ -290,13 +286,10 @@ export function Composer({ initial }: { initial: Draft }) {
       {files.length > 0 ? (
         <ul className="flex flex-wrap gap-2" aria-label="Attachments">
           {files.map((f) => (
-            <li
-              key={f.key}
-              className="flex items-center gap-2 rounded border border-neutral-300 px-2 py-1 text-sm dark:border-neutral-700"
-            >
+            <li key={f.key} className="btn px-2 py-1">
               <PaperclipIcon />
               <span className="max-w-48 truncate">{f.name}</span>
-              <span className="text-xs text-neutral-500">
+              <span className="text-xs text-faint">
                 {f.status === 'uploading'
                   ? 'uploading…'
                   : f.status === 'error'
@@ -306,7 +299,7 @@ export function Composer({ initial }: { initial: Draft }) {
               <button
                 type="button"
                 aria-label={`Remove ${f.name}`}
-                className="text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-100"
+                className="text-faint hover:text-fg"
                 onClick={() =>
                   setFiles((all) => all.filter((x) => x.key !== f.key))
                 }
@@ -319,14 +312,14 @@ export function Composer({ initial }: { initial: Draft }) {
       ) : null}
 
       {error ? (
-        <p role="alert" className="text-sm text-red-700 dark:text-red-400">
+        <p role="alert" className="text-sm text-[#ff8da0]">
           {error}
         </p>
       ) : null}
 
       <div className="flex flex-wrap items-center gap-2">
         <button
-          className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-neutral-100 dark:text-neutral-900"
+          className="btn btn-primary px-5 py-2"
           disabled={busy || uploading || recipients.length === 0}
         >
           {busy ? 'Sending…' : 'Send'}
@@ -353,7 +346,7 @@ export function Composer({ initial }: { initial: Draft }) {
         >
           Cancel
         </button>
-        <span className="text-xs text-neutral-500">Ctrl/⌘ + Enter to send</span>
+        <span className="text-xs text-faint">Ctrl/⌘ + Enter to send</span>
       </div>
     </form>
   )

@@ -39,3 +39,10 @@ export const PencilIcon = (p: SVGProps<SVGSVGElement>) => (
     <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
   </svg>
 )
+
+export const MailIcon = (p: SVGProps<SVGSVGElement>) => (
+  <svg {...base} {...p}>
+    <rect x="3" y="5" width="18" height="14" rx="3" />
+    <path d="m4 7 8 6 8-6" />
+  </svg>
+)

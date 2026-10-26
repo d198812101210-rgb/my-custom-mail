@@ -19,7 +19,7 @@ function SearchPage() {
   const initial = Route.useLoaderData()
   return (
     <main>
-      <h2 className="px-4 pt-3 text-sm font-medium text-neutral-500">
+      <h2 className="px-4 pt-3 text-sm font-medium text-dim">
         Results for “{q}”
       </h2>
       <ThreadList

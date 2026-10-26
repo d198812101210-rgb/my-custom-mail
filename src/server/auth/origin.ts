@@ -9,7 +9,10 @@ export function isMutating(method: string): boolean {
  * A missing header is rejected: browsers always send Origin on cross-origin
  * and same-origin POSTs, so its absence means a non-browser or stripped request.
  */
-export function isAllowedOrigin(originHeader: string | null, appUrl: string): boolean {
+export function isAllowedOrigin(
+  originHeader: string | null,
+  appUrl: string,
+): boolean {
   if (!originHeader) return false
   try {
     return new URL(originHeader).origin === new URL(appUrl).origin

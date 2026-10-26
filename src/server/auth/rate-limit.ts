@@ -34,5 +34,7 @@ export async function hit(
 export async function pruneRateLimits(db: Db, now: Date): Promise<void> {
   await db
     .delete(rateLimits)
-    .where(lt(rateLimits.windowStart, new Date(now.getTime() - 24 * 3600 * 1000)))
+    .where(
+      lt(rateLimits.windowStart, new Date(now.getTime() - 24 * 3600 * 1000)),
+    )
 }

@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ApiAuthRequestRouteImport } from './routes/api/auth/request'
 import { Route as ApiAuthVerifyRouteImport } from './routes/api/auth/verify'
+import { Route as ApiWebhooksResendRouteImport } from './routes/api/webhooks/resend'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,18 +35,25 @@ const ApiAuthVerifyRoute = ApiAuthVerifyRouteImport.update({
   path: '/api/auth/verify',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiWebhooksResendRoute = ApiWebhooksResendRouteImport.update({
+  id: '/api/webhooks/resend',
+  path: '/api/webhooks/resend',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/api/auth/request': typeof ApiAuthRequestRoute
   '/api/auth/verify': typeof ApiAuthVerifyRoute
+  '/api/webhooks/resend': typeof ApiWebhooksResendRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/api/auth/request': typeof ApiAuthRequestRoute
   '/api/auth/verify': typeof ApiAuthVerifyRoute
+  '/api/webhooks/resend': typeof ApiWebhooksResendRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,30 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/api/auth/request': typeof ApiAuthRequestRoute
   '/api/auth/verify': typeof ApiAuthVerifyRoute
+  '/api/webhooks/resend': typeof ApiWebhooksResendRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/api/auth/request' | '/api/auth/verify'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/api/auth/request'
+    | '/api/auth/verify'
+    | '/api/webhooks/resend'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/api/auth/request' | '/api/auth/verify'
-  id: '__root__' | '/' | '/login' | '/api/auth/request' | '/api/auth/verify'
+  to:
+    | '/'
+    | '/login'
+    | '/api/auth/request'
+    | '/api/auth/verify'
+    | '/api/webhooks/resend'
+  id:
+    | '__root__'
+    | '/'
+    | '/login'
+    | '/api/auth/request'
+    | '/api/auth/verify'
+    | '/api/webhooks/resend'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +92,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ApiAuthRequestRoute: typeof ApiAuthRequestRoute
   ApiAuthVerifyRoute: typeof ApiAuthVerifyRoute
+  ApiWebhooksResendRoute: typeof ApiWebhooksResendRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -99,6 +125,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthVerifyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/webhooks/resend': {
+      id: '/api/webhooks/resend'
+      path: '/api/webhooks/resend'
+      fullPath: '/api/webhooks/resend'
+      preLoaderRoute: typeof ApiWebhooksResendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,6 +140,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ApiAuthRequestRoute: ApiAuthRequestRoute,
   ApiAuthVerifyRoute: ApiAuthVerifyRoute,
+  ApiWebhooksResendRoute: ApiWebhooksResendRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

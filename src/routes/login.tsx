@@ -67,7 +67,11 @@ function Login() {
     <main className="mx-auto flex min-h-dvh w-full max-w-sm flex-col justify-center gap-6 px-4">
       <h1 className="text-2xl font-semibold">Mailbox</h1>
       {step === 'idle' || step === 'sending' ? (
-        <button className={button} disabled={step === 'sending'} onClick={sendCode}>
+        <button
+          className={button}
+          disabled={step === 'sending'}
+          onClick={sendCode}
+        >
           {step === 'sending' ? 'Sending…' : 'Send code'}
         </button>
       ) : (
@@ -75,7 +79,9 @@ function Login() {
           <input
             className={field}
             value={code}
-            onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+            onChange={(e) =>
+              setCode(e.target.value.replace(/\D/g, '').slice(0, 6))
+            }
             inputMode="numeric"
             autoComplete="one-time-code"
             pattern="\d{6}"
@@ -84,7 +90,10 @@ function Login() {
             aria-label="6-digit code"
             autoFocus
           />
-          <button className={button} disabled={code.length !== 6 || step === 'verifying'}>
+          <button
+            className={button}
+            disabled={code.length !== 6 || step === 'verifying'}
+          >
             {step === 'verifying' ? 'Checking…' : 'Sign in'}
           </button>
           <button
@@ -96,7 +105,10 @@ function Login() {
           </button>
         </form>
       )}
-      <p role="status" className="min-h-6 text-sm text-neutral-600 dark:text-neutral-400">
+      <p
+        role="status"
+        className="min-h-6 text-sm text-neutral-600 dark:text-neutral-400"
+      >
         {message}
       </p>
     </main>

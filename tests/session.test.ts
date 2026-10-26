@@ -28,7 +28,9 @@ describe('sessions', () => {
 
   it('validates a live session and rejects unknown tokens', async () => {
     const { token } = await createSession(db, t0)
-    expect(await validateSession(db, token, t0)).toMatchObject({ refreshed: false })
+    expect(await validateSession(db, token, t0)).toMatchObject({
+      refreshed: false,
+    })
     expect(await validateSession(db, 'nope', t0)).toBeNull()
   })
 
@@ -47,7 +49,9 @@ describe('sessions', () => {
   it('slides the expiry forward when used', async () => {
     const { token } = await createSession(db, t0)
     const day60 = new Date(t0.getTime() + 60 * 24 * 3600 * 1000)
-    expect(await validateSession(db, token, day60)).toMatchObject({ refreshed: true })
+    expect(await validateSession(db, token, day60)).toMatchObject({
+      refreshed: true,
+    })
     const day120 = new Date(t0.getTime() + 120 * 24 * 3600 * 1000)
     expect(await validateSession(db, token, day120)).not.toBeNull()
   })

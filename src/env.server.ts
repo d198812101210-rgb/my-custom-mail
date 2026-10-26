@@ -3,13 +3,18 @@ import { z } from 'zod'
 const mailbox = z
   .string()
   .min(3)
-  .regex(/^(?:[^<>]*<)?[^<>@\s]+@[^<>@\s]+\.[^<>@\s]+>?$/, 'must be an email address or "Name <address>"')
+  .regex(
+    /^(?:[^<>]*<)?[^<>@\s]+@[^<>@\s]+\.[^<>@\s]+>?$/,
+    'must be an email address or "Name <address>"',
+  )
 
 const schema = z.object({
   RESEND_API_KEY: z.string().min(1),
   // Optional so the first deploy can happen before the webhook exists.
   RESEND_WEBHOOK_SECRET: z.string().min(1).optional(),
-  DATABASE_URL: z.string().regex(/^postgres(ql)?:\/\//, 'must be a postgres:// URL'),
+  DATABASE_URL: z
+    .string()
+    .regex(/^postgres(ql)?:\/\//, 'must be a postgres:// URL'),
   SUPABASE_URL: z.url(),
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
   OWNER_EMAIL: z

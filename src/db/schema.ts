@@ -87,9 +87,11 @@ export const messages = pgTable(
     sentOrReceivedAt: timestamptz('sent_or_received_at').notNull(),
     createdAt: timestamptz('created_at').notNull().defaultNow(),
     // 'simple' config: no language-specific stemming, so mixed-language mail works.
-    // Only immutable expressions are allowed in a generated column, hence no array columns.
+    // translate() splits addresses and URLs into parts (billing@acme.com -> billing acme com),
+    // which the parser would otherwise keep as one token. It is immutable, as generated columns
+    // require; array columns are not, so recipients are not part of the search document.
     search: tsvector('search').generatedAlwaysAs(
-      sql`to_tsvector('simple', coalesce(subject, '') || ' ' || coalesce(text_body, '') || ' ' || coalesce(from_address, '') || ' ' || coalesce(from_name, ''))`,
+      sql`to_tsvector('simple', translate(coalesce(subject, '') || ' ' || coalesce(text_body, '') || ' ' || coalesce(from_address, '') || ' ' || coalesce(from_name, ''), '@._-/', '     '))`,
     ),
   },
   (t) => [

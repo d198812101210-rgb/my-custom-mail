@@ -9,20 +9,49 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as AppFolderRouteImport } from './routes/_app/$folder'
+import { Route as AppSearchRouteImport } from './routes/_app/search'
+import { Route as AppThreadIdRouteImport } from './routes/_app/thread.$id'
+import { Route as ApiAttachmentsIdRouteImport } from './routes/api/attachments/$id'
 import { Route as ApiAuthRequestRouteImport } from './routes/api/auth/request'
 import { Route as ApiAuthVerifyRouteImport } from './routes/api/auth/verify'
 import { Route as ApiWebhooksResendRouteImport } from './routes/api/webhooks/resend'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFolderRoute = AppFolderRouteImport.update({
+  id: '/$folder',
+  path: '/$folder',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSearchRoute = AppSearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppThreadIdRoute = AppThreadIdRouteImport.update({
+  id: '/thread/$id',
+  path: '/thread/$id',
+  getParentRoute: () => AppRoute,
+} as any)
+const ApiAttachmentsIdRoute = ApiAttachmentsIdRouteImport.update({
+  id: '/api/attachments/$id',
+  path: '/api/attachments/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthRequestRoute = ApiAuthRequestRouteImport.update({
@@ -42,23 +71,36 @@ const ApiWebhooksResendRoute = ApiWebhooksResendRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof AppIndexRoute
   '/login': typeof LoginRoute
+  '/$folder': typeof AppFolderRoute
+  '/search': typeof AppSearchRoute
+  '/thread/$id': typeof AppThreadIdRoute
+  '/api/attachments/$id': typeof ApiAttachmentsIdRoute
   '/api/auth/request': typeof ApiAuthRequestRoute
   '/api/auth/verify': typeof ApiAuthVerifyRoute
   '/api/webhooks/resend': typeof ApiWebhooksResendRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/$folder': typeof AppFolderRoute
+  '/search': typeof AppSearchRoute
+  '/': typeof AppIndexRoute
+  '/thread/$id': typeof AppThreadIdRoute
+  '/api/attachments/$id': typeof ApiAttachmentsIdRoute
   '/api/auth/request': typeof ApiAuthRequestRoute
   '/api/auth/verify': typeof ApiAuthVerifyRoute
   '/api/webhooks/resend': typeof ApiWebhooksResendRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
+  '/_app/$folder': typeof AppFolderRoute
+  '/_app/search': typeof AppSearchRoute
+  '/_app/': typeof AppIndexRoute
+  '/_app/thread/$id': typeof AppThreadIdRoute
+  '/api/attachments/$id': typeof ApiAttachmentsIdRoute
   '/api/auth/request': typeof ApiAuthRequestRoute
   '/api/auth/verify': typeof ApiAuthVerifyRoute
   '/api/webhooks/resend': typeof ApiWebhooksResendRoute
@@ -68,28 +110,42 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/$folder'
+    | '/search'
+    | '/thread/$id'
+    | '/api/attachments/$id'
     | '/api/auth/request'
     | '/api/auth/verify'
     | '/api/webhooks/resend'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
     | '/login'
+    | '/$folder'
+    | '/search'
+    | '/'
+    | '/thread/$id'
+    | '/api/attachments/$id'
     | '/api/auth/request'
     | '/api/auth/verify'
     | '/api/webhooks/resend'
   id:
     | '__root__'
-    | '/'
+    | '/_app'
     | '/login'
+    | '/_app/$folder'
+    | '/_app/search'
+    | '/_app/'
+    | '/_app/thread/$id'
+    | '/api/attachments/$id'
     | '/api/auth/request'
     | '/api/auth/verify'
     | '/api/webhooks/resend'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
   LoginRoute: typeof LoginRoute
+  ApiAttachmentsIdRoute: typeof ApiAttachmentsIdRoute
   ApiAuthRequestRoute: typeof ApiAuthRequestRoute
   ApiAuthVerifyRoute: typeof ApiAuthVerifyRoute
   ApiWebhooksResendRoute: typeof ApiWebhooksResendRoute
@@ -97,11 +153,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
+    '/_app': {
+      id: '/_app'
+      path: ''
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+      preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -109,6 +165,41 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/': {
+      id: '/_app/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/$folder': {
+      id: '/_app/$folder'
+      path: '/$folder'
+      fullPath: '/$folder'
+      preLoaderRoute: typeof AppFolderRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/search': {
+      id: '/_app/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof AppSearchRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/thread/$id': {
+      id: '/_app/thread/$id'
+      path: '/thread/$id'
+      fullPath: '/thread/$id'
+      preLoaderRoute: typeof AppThreadIdRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/api/attachments/$id': {
+      id: '/api/attachments/$id'
+      path: '/api/attachments/$id'
+      fullPath: '/api/attachments/$id'
+      preLoaderRoute: typeof ApiAttachmentsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/auth/request': {
@@ -135,9 +226,26 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AppRouteChildren {
+  AppFolderRoute: typeof AppFolderRoute
+  AppSearchRoute: typeof AppSearchRoute
+  AppIndexRoute: typeof AppIndexRoute
+  AppThreadIdRoute: typeof AppThreadIdRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppFolderRoute: AppFolderRoute,
+  AppSearchRoute: AppSearchRoute,
+  AppIndexRoute: AppIndexRoute,
+  AppThreadIdRoute: AppThreadIdRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
   LoginRoute: LoginRoute,
+  ApiAttachmentsIdRoute: ApiAttachmentsIdRoute,
   ApiAuthRequestRoute: ApiAuthRequestRoute,
   ApiAuthVerifyRoute: ApiAuthVerifyRoute,
   ApiWebhooksResendRoute: ApiWebhooksResendRoute,

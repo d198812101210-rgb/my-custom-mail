@@ -119,7 +119,7 @@ export async function assignThread(
       .from(threads)
       .where(
         sql`${threads.normalizedSubject} = ${normalized}
-          and ${threads.lastMessageAt} >= ${since}
+          and ${threads.lastMessageAt} >= ${since.toISOString()}::timestamptz
           and ${threads.participants} && ${textArray(participants)}`,
       )
       .orderBy(desc(threads.lastMessageAt))
@@ -144,6 +144,9 @@ export async function assignThread(
   return threadId
 }
 
+// Dates inside sql`` must be passed as ISO strings: drizzle's postgres-js driver turns off the
+// driver's own Date serializer (typed columns encode for it), so a raw Date reaches Node's
+// Buffer code and throws ERR_INVALID_ARG_TYPE. PGlite in tests accepts Dates, so a test pins this.
 /** Advance last_message_at (never backwards) and merge participants. */
 export async function touchThread(
   db: Db,
@@ -154,7 +157,7 @@ export async function touchThread(
   await db
     .update(threads)
     .set({
-      lastMessageAt: sql`greatest(${threads.lastMessageAt}, ${date})`,
+      lastMessageAt: sql`greatest(${threads.lastMessageAt}, ${date.toISOString()}::timestamptz)`,
       participants:
         participants.length > 0
           ? sql`(select coalesce(array_agg(distinct p), '{}') from unnest(${threads.participants} || ${textArray(participants)}) as p)`

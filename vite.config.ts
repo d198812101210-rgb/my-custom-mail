@@ -3,6 +3,7 @@ import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
+import { STATIC_SECURITY_HEADERS } from './src/server/security-headers'
 
 export default defineConfig({
   resolve: { tsconfigPaths: true },
@@ -12,6 +13,8 @@ export default defineConfig({
     tanstackStart({ serverFns: { disableCsrfMiddlewareWarning: true } }),
     nitro({
       routeRules: {
+        // Headers for static files too; dynamic responses also get the CSP in src/start.ts.
+        '/**': { headers: STATIC_SECURITY_HEADERS },
         // A cached service worker would delay every update by up to a day.
         '/sw.js': {
           headers: {

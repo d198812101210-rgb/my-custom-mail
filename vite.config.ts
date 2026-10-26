@@ -6,5 +6,12 @@ import { nitro } from 'nitro/vite'
 
 export default defineConfig({
   resolve: { tsconfigPaths: true },
-  plugins: [tanstackStart(), nitro(), viteReact(), tailwindcss()],
+  plugins: [
+    // CSRF is enforced for every mutating request (server functions included)
+    // by the Origin check in src/start.ts, so Start's default warning does not apply.
+    tanstackStart({ serverFns: { disableCsrfMiddlewareWarning: true } }),
+    nitro(),
+    viteReact(),
+    tailwindcss(),
+  ],
 })

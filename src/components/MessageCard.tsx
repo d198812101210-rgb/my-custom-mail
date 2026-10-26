@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { PaperclipIcon } from '#/components/icons'
 import { MailFrame } from '#/components/MailFrame'
@@ -114,6 +115,27 @@ export function MessageCard({
           ) : null}
 
           <div className="flex flex-wrap gap-2">
+            <Link
+              to="/compose"
+              search={{ mode: 'reply', src: m.id }}
+              className={small}
+            >
+              Reply
+            </Link>
+            <Link
+              to="/compose"
+              search={{ mode: 'replyAll', src: m.id }}
+              className={small}
+            >
+              Reply all
+            </Link>
+            <Link
+              to="/compose"
+              search={{ mode: 'forward', src: m.id }}
+              className={small}
+            >
+              Forward
+            </Link>
             <button className={small} onClick={onUnread}>
               Mark unread
             </button>

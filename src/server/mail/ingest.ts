@@ -24,7 +24,7 @@ export type IngestResult = 'imported' | 'duplicate'
 // One writer at a time: keeps thread assignment race-free (two replies arriving
 // together cannot create two threads) and makes retries of the same email serial.
 // Single-user app, so the lost parallelism is irrelevant.
-const INGEST_LOCK_KEY = 7001
+export const INGEST_LOCK_KEY = 7001
 
 function header(
   headers: Record<string, string> | null,

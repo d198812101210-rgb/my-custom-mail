@@ -66,12 +66,20 @@ function ThreadPage() {
     back()
   }
 
+  function replyTo(mode: 'reply' | 'replyAll' | 'forward') {
+    const last = thread.messages.at(-1)
+    if (last) void navigate({ to: '/compose', search: { mode, src: last.id } })
+  }
+
   useHotkeys({
     Escape: back,
     q: back,
     e: () => canArchive && void moveThread('archive', true),
     '#': () => !allTrashed && void moveThread('trash', true),
     u: () => void markUnread(),
+    r: () => replyTo('reply'),
+    a: () => replyTo('replyAll'),
+    f: () => replyTo('forward'),
   })
 
   const btn =

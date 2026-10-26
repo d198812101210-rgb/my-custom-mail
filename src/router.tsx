@@ -1,3 +1,4 @@
+import { createIsomorphicFn } from '@tanstack/react-start'
 import {
   Link,
   createRouter as createTanStackRouter,
@@ -40,9 +41,15 @@ function ErrorView({ error, reset }: ErrorComponentProps) {
   )
 }
 
-export function getRouter() {
+/** The request's CSP nonce on the server (set by the middleware in src/start.ts); none in the browser. */
+const getNonce = createIsomorphicFn()
+  .server(async () => (await import('#/server/security.server')).currentNonce())
+  .client(() => undefined)
+
+export function createAppRouter(nonce?: string) {
   const router = createTanStackRouter({
     routeTree,
+    ssr: { nonce },
     scrollRestoration: true,
     defaultPreload: 'intent',
     defaultPreloadStaleTime: 0,
@@ -53,8 +60,13 @@ export function getRouter() {
   return router
 }
 
+/** Entry point used by TanStack Start for every request (and once in the browser). */
+export async function getRouter() {
+  return createAppRouter(await getNonce())
+}
+
 declare module '@tanstack/react-router' {
   interface Register {
-    router: ReturnType<typeof getRouter>
+    router: ReturnType<typeof createAppRouter>
   }
 }

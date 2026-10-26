@@ -19,7 +19,7 @@ export async function createTestDb() {
   })()
   const db = await shared
   await db.execute(
-    sql`truncate table attachments, messages, threads, sessions, otp_codes, rate_limits restart identity cascade`,
+    sql`truncate table attachments, messages, threads, sessions, otp_codes, rate_limits, push_subscriptions restart identity cascade`,
   )
   return { db }
 }

@@ -33,6 +33,7 @@ describe('source audit', () => {
       'src/routes/api/webhooks/resend.ts',
       'src/server/mail.fn.ts',
       'src/server/compose.fn.ts',
+      'src/server/push.server.ts',
     ])
     for (const f of srcFiles) {
       const uses = read(f).match(/console\.\w+/g) ?? []
@@ -83,7 +84,13 @@ describe('source audit', () => {
   })
 
   it('validates the input of every server function that takes input', () => {
-    const noInput = new Set(['logout', 'logoutEverywhere', 'unreadCountsFn'])
+    const noInput = new Set([
+      'logout',
+      'logoutEverywhere',
+      'unreadCountsFn',
+      'pushConfigFn',
+      'testPushFn',
+    ])
     for (const f of srcFiles.filter((p) => p.endsWith('.fn.ts'))) {
       const code = read(f)
       const decls = code.split(/export const /).slice(1)

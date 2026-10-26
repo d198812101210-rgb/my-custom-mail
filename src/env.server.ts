@@ -27,6 +27,9 @@ const schema = z.object({
   MAIL_FROM: mailbox,
   AUTH_FROM: mailbox,
   APP_URL: z.url(),
+  // Web Push. Both keys or neither: without them notifications are simply off.
+  VAPID_PUBLIC_KEY: z.string().min(1).optional(),
+  VAPID_PRIVATE_KEY: z.string().min(1).optional(),
 })
 
 export type Env = z.infer<typeof schema>
@@ -36,7 +39,11 @@ export function parseEnv(source: Record<string, string | undefined>): Env {
   const cleaned = Object.fromEntries(
     Object.entries(source).filter(([, v]) => v !== undefined && v !== ''),
   )
-  const result = schema.safeParse(cleaned)
+  const result = schema
+    .refine((e) => !e.VAPID_PUBLIC_KEY === !e.VAPID_PRIVATE_KEY, {
+      message: 'VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY must be set together',
+    })
+    .safeParse(cleaned)
   if (!result.success) {
     // Names and messages only: never echo values, they may be secrets.
     const problems = result.error.issues

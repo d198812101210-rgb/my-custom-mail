@@ -16,6 +16,7 @@ describe('schema migration', () => {
       'attachments',
       'messages',
       'otp_codes',
+      'push_subscriptions',
       'rate_limits',
       'sessions',
       'threads',

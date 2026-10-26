@@ -13,6 +13,8 @@ export interface WebhookDeps {
     webhookSecret: string
   }) => unknown
   ingest: IngestDeps
+  /** Called once per newly imported email (not for duplicates). Must not decide the response. */
+  notify?: (emailId: string) => Promise<unknown>
   log?: (line: string) => void
 }
 
@@ -67,6 +69,14 @@ export async function handleResendWebhook(
 
   try {
     const result = await ingestReceivedEmail(deps.ingest, data.data.email_id)
+    if (result === 'imported' && deps.notify) {
+      // The mail is already saved, so a push failure must not make Resend retry the webhook.
+      try {
+        await deps.notify(data.data.email_id)
+      } catch (e) {
+        log(`webhook: notify failed: ${describeError(e)}`)
+      }
+    }
     return json({ ok: true, result }, 200)
   } catch (e) {
     log(`webhook: ingest failed: ${describeError(e)}`)

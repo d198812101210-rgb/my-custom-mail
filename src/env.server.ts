@@ -15,6 +15,8 @@ const schema = z.object({
   DATABASE_URL: z
     .string()
     .regex(/^postgres(ql)?:\/\//, 'must be a postgres:// URL'),
+  // Connections per server instance. Keep it small on serverless; scripts/dev-db.ts needs 1.
+  DATABASE_POOL_MAX: z.coerce.number().int().min(1).max(20).default(5),
   SUPABASE_URL: z.url(),
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
   OWNER_EMAIL: z

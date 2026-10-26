@@ -23,6 +23,16 @@ describe('parseEnv', () => {
     ).toBeUndefined()
   })
 
+  it('defaults the pool size and validates an override', () => {
+    expect(parseEnv(valid).DATABASE_POOL_MAX).toBe(5)
+    expect(
+      parseEnv({ ...valid, DATABASE_POOL_MAX: '1' }).DATABASE_POOL_MAX,
+    ).toBe(1)
+    expect(() => parseEnv({ ...valid, DATABASE_POOL_MAX: '0' })).toThrow(
+      /DATABASE_POOL_MAX/,
+    )
+  })
+
   it('rejects an owner address on the mail domain', () => {
     expect(() =>
       parseEnv({ ...valid, OWNER_EMAIL: 'me@tanakadev.digital' }),

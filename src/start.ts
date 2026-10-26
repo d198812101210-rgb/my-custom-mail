@@ -37,7 +37,9 @@ const gate = createMiddleware().server(
     if (PUBLIC_PATHS.has(pathname)) return next()
 
     const token = ctx.sessionTokenFrom(request)
-    const session = token ? await sessions.validateSession(db, token, new Date()) : null
+    const session = token
+      ? await sessions.validateSession(db, token, new Date())
+      : null
     if (!token || !session) {
       const wantsPage =
         handlerType === 'router' &&

@@ -1,4 +1,9 @@
-import { createHash, randomBytes, randomInt, timingSafeEqual } from 'node:crypto'
+import {
+  createHash,
+  randomBytes,
+  randomInt,
+  timingSafeEqual,
+} from 'node:crypto'
 
 export function generateOtp(): string {
   return randomInt(0, 1_000_000).toString().padStart(6, '0')

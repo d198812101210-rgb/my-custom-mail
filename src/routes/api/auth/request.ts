@@ -16,9 +16,15 @@ export const Route = createFileRoute('/api/auth/request')({
         })
         if (result === 'sent') return Response.json({ ok: true })
         if (result === 'rate_limited') {
-          return Response.json({ ok: false, error: 'rate_limited' }, { status: 429 })
+          return Response.json(
+            { ok: false, error: 'rate_limited' },
+            { status: 429 },
+          )
         }
-        return Response.json({ ok: false, error: 'send_failed' }, { status: 502 })
+        return Response.json(
+          { ok: false, error: 'send_failed' },
+          { status: 502 },
+        )
       },
     },
   },

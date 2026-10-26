@@ -33,7 +33,12 @@ export async function validateSession(
   const [row] = await db
     .select()
     .from(sessions)
-    .where(and(eq(sessions.tokenHash, hashToken(token)), gt(sessions.expiresAt, now)))
+    .where(
+      and(
+        eq(sessions.tokenHash, hashToken(token)),
+        gt(sessions.expiresAt, now),
+      ),
+    )
     .limit(1)
   if (!row) return null
 
@@ -42,7 +47,10 @@ export async function validateSession(
   }
   await db
     .update(sessions)
-    .set({ lastUsedAt: now, expiresAt: new Date(now.getTime() + SESSION_TTL_MS) })
+    .set({
+      lastUsedAt: now,
+      expiresAt: new Date(now.getTime() + SESSION_TTL_MS),
+    })
     .where(eq(sessions.id, row.id))
   return { id: row.id, refreshed: true }
 }

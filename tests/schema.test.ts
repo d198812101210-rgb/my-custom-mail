@@ -12,9 +12,14 @@ describe('schema migration', () => {
           where n.nspname = 'public' and c.relkind = 'r'`,
     )
     const names = rows.rows.map((r) => r.relname).sort()
-    expect(names).toEqual(
-      ['attachments', 'messages', 'otp_codes', 'rate_limits', 'sessions', 'threads'],
-    )
+    expect(names).toEqual([
+      'attachments',
+      'messages',
+      'otp_codes',
+      'rate_limits',
+      'sessions',
+      'threads',
+    ])
     expect(rows.rows.every((r) => r.relrowsecurity)).toBe(true)
     const policies = await db.execute(sql`select 1 from pg_policies`)
     expect(policies.rows).toHaveLength(0)
@@ -47,7 +52,10 @@ describe('schema migration', () => {
 
   it('rejects an unknown folder', async () => {
     const { db } = await createTestDb()
-    const [t] = await db.insert(threads).values({ normalizedSubject: 'x' }).returning()
+    const [t] = await db
+      .insert(threads)
+      .values({ normalizedSubject: 'x' })
+      .returning()
     if (!t) throw new Error('thread not inserted')
     await expect(
       db.insert(messages).values({

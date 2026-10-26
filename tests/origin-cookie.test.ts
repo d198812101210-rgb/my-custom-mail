@@ -12,7 +12,9 @@ describe('origin check', () => {
   it('accepts the app origin only', () => {
     expect(isAllowedOrigin('https://mail.tanakadev.digital', app)).toBe(true)
     expect(isAllowedOrigin('https://evil.example', app)).toBe(false)
-    expect(isAllowedOrigin('https://mail.tanakadev.digital.evil.example', app)).toBe(false)
+    expect(
+      isAllowedOrigin('https://mail.tanakadev.digital.evil.example', app),
+    ).toBe(false)
     expect(isAllowedOrigin('http://mail.tanakadev.digital', app)).toBe(false)
   })
 
@@ -23,8 +25,10 @@ describe('origin check', () => {
   })
 
   it('treats only GET/HEAD/OPTIONS as safe', () => {
-    for (const m of ['GET', 'HEAD', 'OPTIONS', 'get']) expect(isMutating(m)).toBe(false)
-    for (const m of ['POST', 'PUT', 'PATCH', 'DELETE']) expect(isMutating(m)).toBe(true)
+    for (const m of ['GET', 'HEAD', 'OPTIONS', 'get'])
+      expect(isMutating(m)).toBe(false)
+    for (const m of ['POST', 'PUT', 'PATCH', 'DELETE'])
+      expect(isMutating(m)).toBe(true)
   })
 })
 
@@ -32,7 +36,13 @@ describe('session cookie', () => {
   it('is httpOnly, Secure, SameSite=Lax and host-pinned on https', () => {
     const c = serializeSessionCookie('tok', { secure: true })
     expect(c).toMatch(/^__Host-session=tok;/)
-    for (const a of ['HttpOnly', 'Secure', 'SameSite=Lax', 'Path=/', 'Max-Age=7776000']) {
+    for (const a of [
+      'HttpOnly',
+      'Secure',
+      'SameSite=Lax',
+      'Path=/',
+      'Max-Age=7776000',
+    ]) {
       expect(c).toContain(a)
     }
     expect(c).not.toContain('Domain')
@@ -50,7 +60,9 @@ describe('session cookie', () => {
   })
 
   it('reads the right cookie from a header', () => {
-    expect(readCookie('a=1; __Host-session=abc; b=2', '__Host-session')).toBe('abc')
+    expect(readCookie('a=1; __Host-session=abc; b=2', '__Host-session')).toBe(
+      'abc',
+    )
     expect(readCookie('a=1', '__Host-session')).toBeUndefined()
     expect(readCookie(null, 'x')).toBeUndefined()
     expect(readCookie('session=', 'session')).toBeUndefined()

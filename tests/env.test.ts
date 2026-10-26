@@ -18,16 +18,23 @@ describe('parseEnv', () => {
   })
 
   it('treats an empty webhook secret as unset', () => {
-    expect(parseEnv({ ...valid, RESEND_WEBHOOK_SECRET: '' }).RESEND_WEBHOOK_SECRET).toBeUndefined()
+    expect(
+      parseEnv({ ...valid, RESEND_WEBHOOK_SECRET: '' }).RESEND_WEBHOOK_SECRET,
+    ).toBeUndefined()
   })
 
   it('rejects an owner address on the mail domain', () => {
-    expect(() => parseEnv({ ...valid, OWNER_EMAIL: 'me@tanakadev.digital' })).toThrow(/OWNER_EMAIL/)
+    expect(() =>
+      parseEnv({ ...valid, OWNER_EMAIL: 'me@tanakadev.digital' }),
+    ).toThrow(/OWNER_EMAIL/)
   })
 
   it('does not leak values in the error message', () => {
     try {
-      parseEnv({ ...valid, DATABASE_URL: 'mysql://secret-user:secret-pass@h/db' })
+      parseEnv({
+        ...valid,
+        DATABASE_URL: 'mysql://secret-user:secret-pass@h/db',
+      })
       throw new Error('should have thrown')
     } catch (e) {
       expect(String(e)).toContain('DATABASE_URL')

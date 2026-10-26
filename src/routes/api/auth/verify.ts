@@ -11,13 +11,14 @@ export const Route = createFileRoute('/api/auth/verify')({
         if (!parsed.success) {
           return Response.json({ ok: false, error: 'invalid' }, { status: 400 })
         }
-        const [{ db }, { verifyOtp }, { createSession }, ctx, cookie] = await Promise.all([
-          import('#/db/client'),
-          import('#/server/auth/otp'),
-          import('#/server/auth/session'),
-          import('#/server/auth/context.server'),
-          import('#/server/auth/cookie'),
-        ])
+        const [{ db }, { verifyOtp }, { createSession }, ctx, cookie] =
+          await Promise.all([
+            import('#/db/client'),
+            import('#/server/auth/otp'),
+            import('#/server/auth/session'),
+            import('#/server/auth/context.server'),
+            import('#/server/auth/cookie'),
+          ])
         const now = () => new Date()
         const result = await verifyOtp({ db, now }, parsed.data.code)
         if (!result.ok) {
@@ -31,7 +32,10 @@ export const Route = createFileRoute('/api/auth/verify')({
           { ok: true },
           {
             headers: {
-              'Set-Cookie': cookie.serializeSessionCookie(token, ctx.cookieConfig),
+              'Set-Cookie': cookie.serializeSessionCookie(
+                token,
+                ctx.cookieConfig,
+              ),
             },
           },
         )

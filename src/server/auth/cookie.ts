@@ -14,17 +14,24 @@ export function sessionCookieName({ secure }: CookieConfig): string {
   return secure ? '__Host-session' : 'session'
 }
 
-export function readCookie(header: string | null, name: string): string | undefined {
+export function readCookie(
+  header: string | null,
+  name: string,
+): string | undefined {
   if (!header) return undefined
   for (const part of header.split(';')) {
     const i = part.indexOf('=')
     if (i === -1) continue
-    if (part.slice(0, i).trim() === name) return part.slice(i + 1).trim() || undefined
+    if (part.slice(0, i).trim() === name)
+      return part.slice(i + 1).trim() || undefined
   }
   return undefined
 }
 
-export function serializeSessionCookie(token: string, cfg: CookieConfig): string {
+export function serializeSessionCookie(
+  token: string,
+  cfg: CookieConfig,
+): string {
   return [
     `${sessionCookieName(cfg)}=${token}`,
     `Max-Age=${SESSION_TTL_MS / 1000}`,

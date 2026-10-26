@@ -12,18 +12,26 @@ export const logout = createServerFn({ method: 'POST' }).handler(async () => {
   ])
   const token = ctx.sessionTokenFrom(getRequest())
   if (token) await deleteSession(db, token)
-  appendResponseHeader('Set-Cookie', cookie.serializeClearedCookie(ctx.cookieConfig))
+  appendResponseHeader(
+    'Set-Cookie',
+    cookie.serializeClearedCookie(ctx.cookieConfig),
+  )
   return { ok: true as const }
 })
 
-export const logoutEverywhere = createServerFn({ method: 'POST' }).handler(async () => {
-  const [{ db }, { deleteAllSessions }, ctx, cookie] = await Promise.all([
-    import('#/db/client'),
-    import('#/server/auth/session'),
-    import('#/server/auth/context.server'),
-    import('#/server/auth/cookie'),
-  ])
-  await deleteAllSessions(db)
-  appendResponseHeader('Set-Cookie', cookie.serializeClearedCookie(ctx.cookieConfig))
-  return { ok: true as const }
-})
+export const logoutEverywhere = createServerFn({ method: 'POST' }).handler(
+  async () => {
+    const [{ db }, { deleteAllSessions }, ctx, cookie] = await Promise.all([
+      import('#/db/client'),
+      import('#/server/auth/session'),
+      import('#/server/auth/context.server'),
+      import('#/server/auth/cookie'),
+    ])
+    await deleteAllSessions(db)
+    appendResponseHeader(
+      'Set-Cookie',
+      cookie.serializeClearedCookie(ctx.cookieConfig),
+    )
+    return { ok: true as const }
+  },
+)

@@ -7,5 +7,8 @@ export const cookieConfig: CookieConfig = {
 }
 
 export function sessionTokenFrom(request: Request): string | undefined {
-  return readCookie(request.headers.get('cookie'), sessionCookieName(cookieConfig))
+  return readCookie(
+    request.headers.get('cookie'),
+    sessionCookieName(cookieConfig),
+  )
 }

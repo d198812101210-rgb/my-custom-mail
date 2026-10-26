@@ -22,7 +22,11 @@ export interface OtpDeps {
 
 export type RequestResult = 'sent' | 'rate_limited' | 'send_failed'
 
-export async function requestOtp({ db, now, sendCode }: OtpDeps): Promise<RequestResult> {
+export async function requestOtp({
+  db,
+  now,
+  sendCode,
+}: OtpDeps): Promise<RequestResult> {
   const t = now()
   // Evaluate every window so each counter advances even if an earlier one rejects.
   const allowed = await Promise.all(
@@ -36,7 +40,9 @@ export async function requestOtp({ db, now, sendCode }: OtpDeps): Promise<Reques
     .update(otpCodes)
     .set({ consumedAt: t })
     .where(and(isNull(otpCodes.consumedAt), gt(otpCodes.expiresAt, t)))
-  await db.delete(otpCodes).where(lt(otpCodes.expiresAt, new Date(t.getTime() - 24 * 3600 * 1000)))
+  await db
+    .delete(otpCodes)
+    .where(lt(otpCodes.expiresAt, new Date(t.getTime() - 24 * 3600 * 1000)))
 
   const id = crypto.randomUUID()
   const code = generateOtp()
@@ -56,7 +62,8 @@ export async function requestOtp({ db, now, sendCode }: OtpDeps): Promise<Reques
   return 'sent'
 }
 
-export type VerifyResult = { ok: true } | { ok: false; reason: 'invalid' | 'rate_limited' }
+export type VerifyResult =
+  { ok: true } | { ok: false; reason: 'invalid' | 'rate_limited' }
 
 /**
  * Wrong, expired, locked, reused and nonexistent codes are all reported as

@@ -14,10 +14,16 @@ function Home() {
       <h1 className="text-2xl font-semibold">Mailbox</h1>
       <p className="mt-2 text-neutral-600 dark:text-neutral-400">Signed in.</p>
       <div className="mt-6 flex gap-3">
-        <button className="rounded-lg border px-3 py-2" onClick={() => signOut(false)}>
+        <button
+          className="rounded-lg border px-3 py-2"
+          onClick={() => signOut(false)}
+        >
           Log out
         </button>
-        <button className="rounded-lg border px-3 py-2" onClick={() => signOut(true)}>
+        <button
+          className="rounded-lg border px-3 py-2"
+          onClick={() => signOut(true)}
+        >
           Log out everywhere
         </button>
       </div>

@@ -92,7 +92,11 @@ describe('verifyOtp', () => {
 
   it('is single use under concurrent attempts', async () => {
     await request()
-    const results = await Promise.all([verify(sentCode(0)), verify(sentCode(0)), verify(sentCode(0))])
+    const results = await Promise.all([
+      verify(sentCode(0)),
+      verify(sentCode(0)),
+      verify(sentCode(0)),
+    ])
     expect(results.filter((r) => r.ok)).toHaveLength(1)
   })
 
@@ -112,7 +116,10 @@ describe('verifyOtp', () => {
     await request()
     const real = sentCode(0)
     for (let i = 0; i < OTP_MAX_ATTEMPTS; i++) {
-      expect(await verify(wrongCode(real))).toEqual({ ok: false, reason: 'invalid' })
+      expect(await verify(wrongCode(real))).toEqual({
+        ok: false,
+        reason: 'invalid',
+      })
       // Stay under the separate verify rate limit's window boundary.
     }
     expect(await verify(real)).toEqual({ ok: false, reason: 'invalid' })
@@ -142,7 +149,9 @@ describe('verifyOtp', () => {
   it('rate-limits verification attempts overall', async () => {
     const results = []
     for (let i = 0; i < 12; i++) results.push(await verify('123456'))
-    expect(results.slice(0, 10).every((r) => !r.ok && r.reason === 'invalid')).toBe(true)
+    expect(
+      results.slice(0, 10).every((r) => !r.ok && r.reason === 'invalid'),
+    ).toBe(true)
     expect(results[10]).toEqual({ ok: false, reason: 'rate_limited' })
   })
 
@@ -158,7 +167,10 @@ describe('verifyOtp', () => {
 
   it('keeps counters in the database', async () => {
     await request()
-    const rows = await db.select().from(rateLimits).where(eq(rateLimits.count, 1))
+    const rows = await db
+      .select()
+      .from(rateLimits)
+      .where(eq(rateLimits.count, 1))
     expect(rows.length).toBeGreaterThan(0)
   })
 })
